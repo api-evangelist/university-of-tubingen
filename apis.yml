@@ -1,0 +1,76 @@
+---
+aid: university-of-tubingen
+name: University of Tübingen
+description: >-
+  The University of Tübingen (Eberhard Karls Universität Tübingen), founded in
+  1477 in Tübingen, Germany, is one of the oldest universities in the country
+  and ranks #222 in the QS World University Rankings 2025. It is a public
+  research university serving roughly 23,000 to 35,000 students. Its publicly
+  documented developer/API footprint is modest and centers on its institutional
+  research data repository, FDAT, run by the Digital Humanities Center on the
+  InvenioRDM platform, which exposes a JSON REST API and an OAI-PMH metadata
+  harvesting endpoint. Source code from several university units is published
+  across multiple GitHub organizations, including the University Library.
+type: Index
+position: Consumer
+access: 3rd-Party
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+url: https://raw.githubusercontent.com/api-evangelist/university-of-tubingen/refs/heads/main/apis.yml
+tags:
+  - Education
+  - Higher Education
+  - University
+  - Research Data
+  - Germany
+  - Open Data
+created: '2026-06-03'
+modified: '2026-06-03'
+specificationVersion: '0.19'
+apis:
+  - aid: university-of-tubingen:fdat-rest
+    name: FDAT Repository REST API
+    description: >-
+      JSON REST API for the FDAT institutional research data repository,
+      operated by the University of Tübingen Digital Humanities Center on the
+      InvenioRDM platform. Provides programmatic access to published records,
+      metadata (DataCite/Dublin Core), files, versions, DOIs, and IIIF
+      manifests.
+    humanURL: https://fdat.uni-tuebingen.de
+    baseURL: https://fdat.uni-tuebingen.de/api/records
+    tags: [ Research Data, Repository, InvenioRDM, DataCite, IIIF ]
+    properties:
+      - type: Documentation
+        url: https://fdat.uni-tuebingen.de
+  - aid: university-of-tubingen:fdat-oai
+    name: FDAT Repository OAI-PMH
+    description: >-
+      OAI-PMH 2.0 metadata harvesting endpoint for the FDAT research data
+      repository. Exposes dataset metadata in DataCite and Dublin Core formats
+      for harvesting by discovery and aggregation services. Administered by
+      fdat@dh-center.uni-tuebingen.de.
+    humanURL: https://fdat.uni-tuebingen.de
+    baseURL: https://fdat.uni-tuebingen.de/oai2d
+    tags: [ Research Data, OAI-PMH, Metadata, Harvesting, DataCite ]
+    properties:
+      - type: Documentation
+        url: https://fdat.uni-tuebingen.de/oai2d?verb=Identify
+common:
+  - type: Website
+    url: https://uni-tuebingen.de/en/
+  - type: GitHub
+    url: https://github.com/ubtue
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/university-of-tuebingen
+  - type: SourceCode
+    url: https://github.com/se-tuebingen
+  - type: Plans
+    url: plans/university-of-tubingen-plans-pricing.yml
+  - type: RateLimits
+    url: rate-limits/university-of-tubingen-rate-limits.yml
+  - type: FinOps
+    url: finops/university-of-tubingen-finops.yml
+  - type: Review
+    url: review.yml
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com

@@ -1,0 +1,42 @@
+---
+name: University of Tübingen
+description: University of Tübingen public developer/API footprint review for APIs.json cataloging.
+url: https://raw.githubusercontent.com/api-evangelist/university-of-tubingen/refs/heads/main/review.yml
+created: '2026-06-03'
+modified: '2026-06-03'
+reviews:
+  - date: '2026-06-03'
+    rating: 2
+    summary: >-
+      No central developer portal or published API documentation hub was found.
+      The verifiable, publicly documented API footprint is the FDAT
+      institutional research data repository (InvenioRDM), which exposes a live
+      JSON REST API and an OAI-PMH 2.0 endpoint, both returning HTTP 200 and
+      confirmed live. Central systems referenced on the website (ALMA student
+      information, ILIAS, Moodle, FIT research information system, TIMMS video
+      portal) are gated and have no public API docs, so none were cataloged to
+      avoid fabrication. Multiple verified GitHub organizations publish source
+      code but not consumer-facing web APIs. Library catalog (Alma/Primo) and
+      SSO endpoints were not confirmed to have public, documented APIs.
+    endpoints:
+      - url: https://uni-tuebingen.de/en/
+        status: 200
+        note: Official English homepage; no developer/API portal linked.
+      - url: https://fdat.uni-tuebingen.de
+        status: 200
+        note: FDAT research data repository (InvenioRDM), Digital Humanities Center.
+      - url: https://fdat.uni-tuebingen.de/api/records
+        status: 200
+        note: Live InvenioRDM JSON REST API returning record hits.
+      - url: https://fdat.uni-tuebingen.de/oai2d?verb=Identify
+        status: 200
+        note: Live OAI-PMH 2.0 endpoint; admin fdat@dh-center.uni-tuebingen.de.
+      - url: https://github.com/ubtue
+        status: 200
+        note: Tübingen University Library GitHub org, 48 public repos.
+      - url: https://github.com/se-tuebingen
+        status: 200
+        note: Software Engineering GitHub org, source code only.
+      - url: https://www.linkedin.com/company/university-of-tuebingen
+        status: 200
+        note: Official LinkedIn company page.
