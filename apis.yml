@@ -55,6 +55,8 @@ apis:
       - type: Documentation
         url: https://fdat.uni-tuebingen.de/oai2d?verb=Identify
 common:
+  - type: DomainSecurity
+    url: security/university-of-tubingen-domain-security.yml
   - type: Website
     url: https://uni-tuebingen.de/en/
   - type: GitHub
