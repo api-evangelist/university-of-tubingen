@@ -1,16 +1,30 @@
 ---
 aid: university-of-tubingen
 name: University of Tübingen
+x-type: university
+x-category: Public Research University
 description: >-
   The University of Tübingen (Eberhard Karls Universität Tübingen), founded in
-  1477 in Tübingen, Germany, is one of the oldest universities in the country
-  and ranks #222 in the QS World University Rankings 2025. It is a public
-  research university serving roughly 23,000 to 35,000 students. Its publicly
-  documented developer/API footprint is modest and centers on its institutional
-  research data repository, FDAT, run by the Digital Humanities Center on the
-  InvenioRDM platform, which exposes a JSON REST API and an OAI-PMH metadata
-  harvesting endpoint. Source code from several university units is published
-  across multiple GitHub organizations, including the University Library.
+  1477, is one of Germany's oldest public research universities and a member of
+  the German Universities Excellence Initiative, with roughly 27,000 students in
+  Baden-Württemberg. It runs no developer portal, publishes no OpenAPI and issues
+  no API keys, and this profile does not pretend otherwise. What it does operate,
+  on its own uni-tuebingen.de hosts, are four genuinely institution-run machine
+  surfaces: the FDAT research data repository (InvenioRDM, Digital Humanities
+  Center) exposing a keyless JSON REST API with IIIF manifests and DataCite DOIs;
+  an OAI-PMH 2.0 provider on the same host; a second, much older OAI-PMH provider
+  for the University Library's TOBIAS-lib publication server (DSpace, records back
+  to 1998, xMetaDissPlus); and a Shibboleth SAML 2.0 identity provider registered
+  in DFN-AAI since 2009 and exported to eduGAIN, asserting REFEDS Research &
+  Scholarship and SIRTFI/SIRTFI2. Its DataCite membership is verifiable — member
+  AWZY "IKM Universität Tübingen", repository client AWZY.FEDNNV, DOI prefix
+  10.57754 — as is its ROR record 03a1kwz48. The University Library additionally
+  builds and operates TueFind, its own VuFind derivative, in the open on GitHub,
+  and runs three national subject discovery services on it (ixTheo, RelBib,
+  KrimDok), currently behind a proof-of-work browser challenge. Campus management
+  (alma), the VLE and the licensed library estate sit behind SSO and are not
+  publicly documented APIs. No InvenioRDM, DSpace or VuFind product contract is
+  saved under this institution — those belong to their upstream projects.
 type: Index
 deliveryModel:
   model: saas
@@ -43,51 +57,262 @@ tags:
   - Education
   - Higher Education
   - University
-  - Research Data
   - Germany
-  - Open Data
+  - Research
+  - Research Data
+  - Research Repository
+  - Open Access
+  - OAI-PMH
+  - Identity Federation
+  - Library
+  - DataCite
 created: '2026-06-03'
-modified: '2026-06-03'
+modified: '2026-09-01'
 specificationVersion: '0.23'
 apis:
   - aid: university-of-tubingen:fdat-rest
     name: FDAT Repository REST API
+    x-operator: institution
     description: >-
-      JSON REST API for the FDAT institutional research data repository,
-      operated by the University of Tübingen Digital Humanities Center on the
-      InvenioRDM platform. Provides programmatic access to published records,
-      metadata (DataCite/Dublin Core), files, versions, DOIs, and IIIF
-      manifests.
-    humanURL: https://fdat.uni-tuebingen.de
+      Keyless, read-only JSON REST API of FDAT, the university's institutional
+      research data repository, operated by the Digital Humanities Center on the
+      InvenioRDM platform and served from the university's own host
+      fdat.uni-tuebingen.de. Verified live 2026-09-01: GET /api/records?size=1
+      returns 200 application/json with 437 published records and faceted
+      aggregations (access_status open 265 / restricted 169 / embargoed 2 /
+      metadata-only 1, file_type, resource_type); GET /api/records/{id} returns
+      200 with ETag, a Link rel="linkset" header and a links object exposing doi,
+      self_doi, parent_doi, files, media_files, versions, archive, communities,
+      access_grants, requests and both self_iiif_manifest and self_iiif_sequence;
+      GET /api/communities and GET /api/vocabularies/languages also return 200.
+      Records carry DataCite DOIs under the university's own prefix (e.g.
+      10.57754/FDAT.zvknn-g0x34) and typed ORCID identifiers on creators. Rate
+      limiting is advertised in headers — X-RateLimit-Limit 500, Retry-After 60.
+      Errors are a plain JSON envelope: {"status": 404, "message": "The
+      persistent identifier does not exist."}. The contract itself is
+      InvenioRDM's, shared by every deployment of that software, so no OpenAPI is
+      saved under this institution — but the deployment, the host, the admin
+      contact and the data are Tübingen's. Note that robots.txt disallows /api
+      for crawlers; the endpoint is open but bulk crawling is not invited.
+    humanURL: https://uni-tuebingen.de/en/249679
     baseURL: https://fdat.uni-tuebingen.de/api/records
-    tags: [ Research Data, Repository, InvenioRDM, DataCite, IIIF ]
+    tags: [ Research Data, Repository, InvenioRDM, DataCite, IIIF, ORCID ]
     properties:
       - type: Documentation
-        url: https://fdat.uni-tuebingen.de
+        url: https://dh-center.uni-tuebingen.de/fdat-policy/faq.html
+      - type: APIReference
+        url: https://fdat.uni-tuebingen.de/api/records
+      - type: Conformance
+        url: conformance/university-of-tubingen-conformance.yml
+      - type: Authentication
+        url: authentication/university-of-tubingen-authentication.yml
   - aid: university-of-tubingen:fdat-oai
     name: FDAT Repository OAI-PMH
+    x-operator: institution
     description: >-
-      OAI-PMH 2.0 metadata harvesting endpoint for the FDAT research data
-      repository. Exposes dataset metadata in DataCite and Dublin Core formats
-      for harvesting by discovery and aggregation services. Administered by
-      fdat@dh-center.uni-tuebingen.de.
-    humanURL: https://fdat.uni-tuebingen.de
+      OAI-PMH 2.0 metadata harvesting provider for the FDAT research data
+      repository. Verified live 2026-09-01 — verb=Identify returns 200 text/xml
+      with repositoryName "FDAT Data Repository", baseURL
+      https://fdat.uni-tuebingen.de/oai2d, adminEmail
+      fdat@dh-center.uni-tuebingen.de, earliestDatestamp 2023-04-11T15:34:13Z,
+      granularity YYYY-MM-DDThh:mm:ssZ and deletedRecord "no".
+      verb=ListMetadataFormats returns marcxml and oai_dc; verb=ListSets
+      enumerates faculty community sets such as community-faculty_eco_social
+      ("Faculty of Economics and Social Sciences"). Institution-hosted and
+      institution-administered.
+    humanURL: https://uni-tuebingen.de/en/249679
     baseURL: https://fdat.uni-tuebingen.de/oai2d
     tags: [ Research Data, OAI-PMH, Metadata, Harvesting, DataCite ]
     properties:
       - type: Documentation
-        url: https://fdat.uni-tuebingen.de/oai2d?verb=Identify
+        url: https://www.openarchives.org/OAI/openarchivesprotocol.html
+      - type: Conformance
+        url: conformance/university-of-tubingen-conformance.yml
+  - aid: university-of-tubingen:tobias-lib-oai
+    name: TOBIAS-lib / Publikationssystem UB Tübingen OAI-PMH
+    x-operator: institution
+    description: >-
+      OAI-PMH 2.0 provider for the University Library's institutional publication
+      server (TOBIAS-lib), running DSpace on the library's own host
+      publikationen.uni-tuebingen.de (ub01.uni-tuebingen.de, 134.2.5.97). Verified
+      live 2026-09-01 — verb=Identify returns 200 text/xml with repositoryName
+      "Publikationssystem UB Tuebingen", adminEmail edl-admin@ub.uni-tuebingen.de,
+      repositoryIdentifier publikationen.uni-tuebingen.de, sampleIdentifier
+      oai:publikationen.uni-tuebingen.de:10900/64291, earliestDatestamp
+      1998-12-16T23:00:00Z and deletedRecord "transient" — twenty-five years of
+      theses, dissertations and open-access publications. verb=ListMetadataFormats
+      returns didl, mods, ore and xMetaDissPlus (the German national dissertation
+      delivery profile for the DNB) among others; a second base URL
+      /oai/driver?verb=Identify also answers 200. This endpoint was missing from
+      the June 2026 profile entirely. The DSpace REST API on the same host is not
+      exposed (/rest/status 403, /server/api 404), so only the OAI-PMH interface
+      is catalogued. The DSpace contract is the product's and is not saved here.
+    humanURL: https://publikationen.uni-tuebingen.de/xmlui/
+    baseURL: https://publikationen.uni-tuebingen.de/oai/request
+    tags: [ Research Repository, OAI-PMH, DSpace, Open Access, Theses, xMetaDissPlus ]
+    properties:
+      - type: Documentation
+        url: https://www.openarchives.org/OAI/openarchivesprotocol.html
+      - type: Conformance
+        url: conformance/university-of-tubingen-conformance.yml
+  - aid: university-of-tubingen:identity-federation
+    name: University of Tübingen Shibboleth Identity Provider (DFN-AAI / eduGAIN)
+    x-operator: federation
+    description: >-
+      Institution-operated Shibboleth SAML 2.0 identity provider, registered in
+      DFN-AAI — the German national research and education identity federation —
+      and published as machine-readable metadata through the federation's MDQ
+      service. EntityID https://idp.uni-tuebingen.de/shibboleth, DisplayName
+      "Universität Tübingen" / "University of Tübingen", shibmd:Scope
+      uni-tuebingen.de, registered 2009-05-26 under registrationAuthority
+      https://www.aai.dfn.de and exported to eduGAIN. SSO endpoints:
+      /idp/profile/SAML2/POST/SSO, /idp/profile/SAML2/Redirect/SSO and
+      /idp/profile/SAML2/SOAP/ECP, plus a SAML 2.0 AttributeAuthorityDescriptor
+      with a SOAP AttributeService. NameID formats persistent and transient. The
+      signing certificate is issued to CN=idp.uni-tuebingen.de, OU=ZDV,
+      O=Universitaet Tuebingen — the university's own computing centre holds the
+      key. Entity attributes assert REFEDS Research & Scholarship support, SIRTFI
+      and SIRTFI2 assurance certification, and membership of bwIDM, the
+      Baden-Württemberg federated identity programme (independently corroborated
+      by the bwIDM link in FDAT's own footer). A federation is shared by
+      definition; the IdP behind it is entirely the institution's, and this is the
+      strongest institution-operated machine surface the university has.
+      RETRIEVAL WARNING: the DFN MDQ service answers 200 with a signed but EMPTY
+      EntitiesDescriptor for an unregistered entityID — the plausible-looking
+      https://idp.uni-tuebingen.de/idp/shibboleth is exactly such a false 200.
+    humanURL: https://uni-tuebingen.de/en/einrichtungen/zentrum-fuer-datenverarbeitung/dienstleistungen/digitale-identitaet/single-sign-on/
+    baseURL: https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fshibboleth
+    tags: [ Identity Federation, SAML, Shibboleth, DFN-AAI, eduGAIN, bwIDM, Single Sign-On ]
+    properties:
+      - type: Documentation
+        url: https://www.aai.dfn.de/en/join/
+      - type: Conformance
+        url: conformance/university-of-tubingen-conformance.yml
+      - type: Authentication
+        url: authentication/university-of-tubingen-authentication.yml
+  - aid: university-of-tubingen:datacite-membership
+    name: DataCite membership and DOI registration (member AWZY)
+    x-operator: registry
+    description: >-
+      The university is a DataCite member and DOI registrant — a fact about the
+      institution, recorded here as a membership rather than as a contract. The
+      DataCite REST API is DataCite's and is never saved under this slug.
+      Evidence, verified 2026-09-01: https://api.datacite.org/providers/awzy
+      returns member AWZY, name "IKM Universität Tübingen", memberType
+      consortium_organization, country DE, created 2020-11-09, rorId
+      https://ror.org/03a1kwz48. https://api.datacite.org/clients/awzy.fednnv
+      returns repository client AWZY.FEDNNV, name "FDAT", url
+      https://fdat.uni-tuebingen.de, clientType repository, year 2022, re3data
+      https://doi.org/10.17616/R3PM1K (re3data r3d100012296).
+      https://api.datacite.org/prefixes/10.57754 relates DOI prefix 10.57754 to
+      that client and provider, and live FDAT records mint DOIs of the form
+      10.57754/FDAT.{id}. Six further repository clients sit under the same AWZY
+      member, reflecting UB Tübingen's role as a DOI agent for theology
+      publications. No Crossref membership exists — api.crossref.org returns zero
+      results for Tübingen.
+    humanURL: https://www.re3data.org/repository/r3d100012296
+    baseURL: https://api.datacite.org/clients/awzy.fednnv
+    tags: [ DataCite, DOI, Registry, Membership, Research Data, Persistent Identifiers ]
+    properties:
+      - type: Conformance
+        url: conformance/university-of-tubingen-conformance.yml
+  - aid: university-of-tubingen:ror-registration
+    name: ROR registration (Research Organization Registry)
+    x-operator: registry
+    description: >-
+      The institution's entry in the Research Organization Registry, ROR ID
+      https://ror.org/03a1kwz48. A registry membership, not a contract — the ROR
+      API is ROR's. Verified 2026-09-01 via
+      https://api.ror.org/organizations/03a1kwz48 (200), which returns the
+      University of Tübingen with website
+      https://www.uni-tuebingen.de/en/university.html. This is the same ROR ID
+      DataCite carries on the university's member record (AWZY), which is what
+      ties the DOI registrant to the institution rather than to a vendor. Note
+      that the neighbouring Tübingen ROR record 00pjgxh97 is the University
+      HOSPITAL (Universitätsklinikum Tübingen, UKT) — a legally distinct body and
+      not this institution.
+    humanURL: https://ror.org/03a1kwz48
+    baseURL: https://api.ror.org/organizations/03a1kwz48
+    tags: [ ROR, Registry, Membership, Persistent Identifiers, Research ]
+  - aid: university-of-tubingen:tuefind-discovery
+    name: TueFind subject discovery services (ixTheo, RelBib, KrimDok)
+    x-operator: institution
+    description: >-
+      Three national subject-information discovery services built and operated by
+      Tübingen University Library on TueFind, the library's own VuFind derivative,
+      whose source it develops in the open at https://github.com/ubtue/tuefind
+      (PHP, actively committed as of 2026-09-01). ixTheo (Index Theologicus,
+      ixtheo.de), RelBib (relbib.de) and KrimDok (krimdok.uni-tuebingen.de) are
+      DFG-funded Fachinformationsdienste — the software, the hosting and the data
+      curation are all the library's. VuFind exposes a /api/v1 search and record
+      API, but as of 2026-09-01 all three hosts sit behind a SHA-256
+      proof-of-work browser-verification interstitial (17 leading zero bits,
+      pow_token cookie, 1800s TTL) that answers 200 with an identical 2,148-byte
+      challenge page for every path, including /api/v1/search. The challenge page
+      is branded with the University of Tübingen and University Library logos,
+      which confirms the operator. Recorded as a live but bot-challenged surface,
+      not as a dead one, and NOT as a verified API contract — the challenge was
+      not defeated. The VuFind contract would in any case be the product's.
+    humanURL: https://ixtheo.de/
+    baseURL: https://ixtheo.de/api/v1
+    tags: [ Library, Discovery, VuFind, TueFind, Open Source, Bot Challenge ]
+    properties:
+      - type: SourceCode
+        url: https://github.com/ubtue/tuefind
+  - aid: university-of-tubingen:library-discovery
+    name: UB Tübingen library catalogue (IBS|BW consortium tenant)
+    x-operator: tenant
+    description: >-
+      The University Library's main catalogue and discovery interface. Verified
+      2026-09-01: https://katalog.ub.uni-tuebingen.de/ redirects (301) to
+      https://rds-tue.ibs-bw.de/opac/, a Tübingen-scoped instance on the IBS|BW
+      (Integriertes Bibliothekssystem Baden-Württemberg) consortium platform,
+      which answers 403 to an anonymous non-browser client. The instance and its
+      holdings are Tübingen's; the platform and its contract belong to the
+      consortium and its library-systems vendor, so nothing is saved here. Its
+      companion campus portal alma.uni-tuebingen.de serves a meta-refresh into
+      /alma/rds?state=user — a login portal, no public API. Recorded as a tenant
+      relationship, which is a real institutional fact.
+    humanURL: https://ub.uni-tuebingen.de/
+    baseURL: https://rds-tue.ibs-bw.de/opac/
+    tags: [ Library, Discovery, Catalog, Tenant, IBS|BW ]
 common:
-  - type: DomainSecurity
-    url: security/university-of-tubingen-domain-security.yml
   - type: Website
     url: https://uni-tuebingen.de/en/
+  - type: APIReference
+    url: https://fdat.uni-tuebingen.de/api/records
+  - type: Documentation
+    url: https://dh-center.uni-tuebingen.de/fdat-policy/faq.html
+  - type: ResearchRepository
+    url: https://uni-tuebingen.de/en/249679
+  - type: LibraryCatalog
+    url: https://ub.uni-tuebingen.de/
+  - type: IdentityFederation
+    url: https://uni-tuebingen.de/en/einrichtungen/zentrum-fuer-datenverarbeitung/dienstleistungen/digitale-identitaet/single-sign-on/
+  - type: ResearchComputing
+    url: https://uni-tuebingen.de/en/einrichtungen/zentrum-fuer-datenverarbeitung/dienstleistungen/server/computing/
   - type: GitHub
     url: https://github.com/ubtue
-  - type: LinkedIn
-    url: https://www.linkedin.com/company/university-of-tuebingen
   - type: SourceCode
     url: https://github.com/se-tuebingen
+  - type: GitHubOrganization
+    url: https://github.com/ubtue/tuefind
+  - type: Support
+    url: https://uni-tuebingen.de/en/einrichtungen/zentrum-fuer-datenverarbeitung/dienstleistungen/a-z/
+  - type: TermsOfService
+    url: https://fdat.uni-tuebingen.de/disclaimer
+  - type: PrivacyPolicy
+    url: https://uni-tuebingen.de/en/data-privacy-statement
+  - type: Blog
+    url: https://uni-tuebingen.de/en/university/news-and-publications/press-releases/
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/university-of-tuebingen
+  - type: Conformance
+    url: conformance/university-of-tubingen-conformance.yml
+  - type: Authentication
+    url: authentication/university-of-tubingen-authentication.yml
+  - type: DomainSecurity
+    url: security/university-of-tubingen-domain-security.yml
   - type: Plans
     url: plans/university-of-tubingen-plans-pricing.yml
   - type: RateLimits
@@ -96,6 +321,102 @@ common:
     url: finops/university-of-tubingen-finops.yml
   - type: Review
     url: review.yml
+x-coverage:
+  state: covered
+  reason: covered
+  detail: >-
+    Four institution-operated machine surfaces were found and verified live on
+    2026-09-01 — the FDAT InvenioRDM REST API and its OAI-PMH provider on
+    fdat.uni-tuebingen.de, a second and far older OAI-PMH provider for the
+    University Library's TOBIAS-lib DSpace publication server on
+    publikationen.uni-tuebingen.de (records back to 1998, xMetaDissPlus), and a
+    Shibboleth SAML 2.0 identity provider published in the DFN-AAI metadata
+    aggregate and exported to eduGAIN. Five education-regime domain standards are
+    evidenced from public endpoints: oai-pmh, shibboleth, saml, orcid and
+    datacite. Two registry memberships are recorded as memberships, never as
+    contracts: DataCite (member AWZY "IKM Universität Tübingen", client
+    AWZY.FEDNNV, prefix 10.57754) and ROR (03a1kwz48). One tenant relationship is
+    recorded: the library catalogue on the IBS|BW consortium platform
+    (katalog.ub.uni-tuebingen.de → rds-tue.ibs-bw.de). No OpenAPI, no developer
+    portal, no llms.txt, no .well-known document and no self-service key issuance
+    exist anywhere on the institution's public surface, and no contract has been
+    generated to stand in for one — the InvenioRDM, DSpace and VuFind contracts
+    are product contracts shared by every deployment of that software and belong
+    in their upstream repos, not here. The library's own TueFind VuFind
+    derivative (ixTheo, RelBib, KrimDok) is genuinely institution-built and
+    open-source on GitHub, but all three hosts currently answer every path,
+    /api/v1 included, with a SHA-256 proof-of-work browser challenge; that is
+    recorded as live-but-challenged and the challenge was not defeated. Campus
+    management (alma), the VLE (ILIAS/Moodle) and the licensed library estate sit
+    behind SSO and were not probeable. No Crossref membership and no open-data
+    portal exist — data. and opendata.uni-tuebingen.de do not resolve at all.
+  generated: '2026-09-01'
+  method: probed
+  evidence:
+    - url: https://fdat.uni-tuebingen.de/api/records?size=1
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/api/communities?size=1
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/api/vocabularies/languages?size=1
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/api/records/doesnotexist123
+      status: 404
+    - url: https://fdat.uni-tuebingen.de/oai2d?verb=Identify
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/oai2d?verb=ListMetadataFormats
+      status: 200
+    - url: https://fdat.uni-tuebingen.de/oai2d?verb=ListSets
+      status: 200
+    - url: https://publikationen.uni-tuebingen.de/oai/request?verb=Identify
+      status: 200
+    - url: https://publikationen.uni-tuebingen.de/oai/request?verb=ListMetadataFormats
+      status: 200
+    - url: https://publikationen.uni-tuebingen.de/xmlui/
+      status: 200
+    - url: https://publikationen.uni-tuebingen.de/rest/status
+      status: 403
+    - url: https://publikationen.uni-tuebingen.de/server/api
+      status: 404
+    - url: https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fshibboleth
+      status: 200
+    - url: https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fidp%2Fshibboleth
+      status: 200
+    - url: https://idp.uni-tuebingen.de/idp/profile/Metadata/SAML
+      status: 200
+    - url: https://api.datacite.org/providers/awzy
+      status: 200
+    - url: https://api.datacite.org/clients/awzy.fednnv
+      status: 200
+    - url: https://api.datacite.org/prefixes/10.57754
+      status: 200
+    - url: https://api.ror.org/organizations/03a1kwz48
+      status: 200
+    - url: https://api.crossref.org/members?query=T%C3%BCbingen
+      status: 200
+    - url: https://ixtheo.de/api/v1/search?lookfor=test
+      status: 200
+    - url: https://krimdok.uni-tuebingen.de/api/v1/search?lookfor=test
+      status: 200
+    - url: https://katalog.ub.uni-tuebingen.de/
+      status: 403
+    - url: https://alma.uni-tuebingen.de/
+      status: 200
+    - url: https://uni-tuebingen.de/llms.txt
+      status: 404
+    - url: https://uni-tuebingen.de/.well-known/security.txt
+      status: 404
+    - url: https://uni-tuebingen.de/apis.json
+      status: 404
+    - url: https://fdat.uni-tuebingen.de/openapi.json
+      status: 404
+    - url: https://data.uni-tuebingen.de/
+      status: 0
+    - url: https://opendata.uni-tuebingen.de/
+      status: 0
+    - url: https://api.uni-tuebingen.de/
+      status: 0
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
