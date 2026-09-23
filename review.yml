@@ -3,8 +3,67 @@ name: University of Tübingen
 description: University of Tübingen public developer/API footprint review for APIs.json cataloging.
 url: https://raw.githubusercontent.com/api-evangelist/university-of-tubingen/refs/heads/main/review.yml
 created: '2026-06-03'
-modified: '2026-06-03'
+modified: '2026-09-01'
 reviews:
+  - date: '2026-09-01'
+    rating: 3
+    summary: >-
+      University pipeline re-profile with operator attribution. The June 2026 review found
+      two surfaces, both FDAT. Three more institution-operated surfaces were found this run
+      and all five were re-probed live: (1) a second, far older OAI-PMH provider for the
+      University Library's TOBIAS-lib DSpace publication server at
+      publikationen.uni-tuebingen.de/oai/request, with records back to 1998-12-16 and the
+      German xMetaDissPlus dissertation profile — missed entirely in June; (2) the
+      university's own Shibboleth SAML 2.0 identity provider, entityID
+      https://idp.uni-tuebingen.de/shibboleth, registered in DFN-AAI since 2009-05-26,
+      exported to eduGAIN, asserting REFEDS R&S and SIRTFI/SIRTFI2 and holding its own key
+      (CN=idp.uni-tuebingen.de, OU=ZDV) — the strongest institution-operated machine
+      surface here and the class universities are most often missing from the catalog;
+      (3) TueFind, the library's own VuFind derivative developed in the open at
+      github.com/ubtue/tuefind and running ixTheo, RelBib and KrimDok, currently behind a
+      SHA-256 proof-of-work browser challenge on every path. Two registry memberships were
+      evidenced and recorded as memberships rather than contracts: DataCite (member AWZY
+      "IKM Universität Tübingen", repository client AWZY.FEDNNV, DOI prefix 10.57754,
+      re3data r3d100012296) and ROR (03a1kwz48). One tenant relationship was recorded: the
+      library catalogue on the IBS|BW consortium platform. No OpenAPI, developer portal,
+      llms.txt, .well-known document or key issuance exists, and none was generated — the
+      InvenioRDM, DSpace and VuFind contracts belong to their upstream projects, not to
+      Tübingen. Rate limits are now probed fact rather than prose: X-RateLimit-Limit 500,
+      Retry-After 60 on the FDAT API.
+    endpoints:
+      - url: https://fdat.uni-tuebingen.de/api/records?size=1
+        status: 200
+        note: Keyless InvenioRDM REST API, 437 published records, faceted aggregations.
+      - url: https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34
+        status: 200
+        note: >-
+          Record document with DataCite DOI 10.57754/FDAT.zvknn-g0x34, typed ORCID creator
+          identifiers, IIIF manifest links, ETag and X-RateLimit-Limit 500.
+      - url: https://publikationen.uni-tuebingen.de/oai/request?verb=Identify
+        status: 200
+        note: >-
+          NEW — "Publikationssystem UB Tuebingen" DSpace OAI-PMH, adminEmail
+          edl-admin@ub.uni-tuebingen.de, earliestDatestamp 1998-12-16.
+      - url: https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fshibboleth
+        status: 200
+        note: >-
+          NEW — DFN-AAI MDQ returns a real 21,696-byte EntityDescriptor for the university's
+          Shibboleth IdP. The similar entityID .../idp/shibboleth returns a signed but EMPTY
+          7,750-byte wrapper, also HTTP 200 — a soft-200 that must not be read as a find.
+      - url: https://api.datacite.org/clients/awzy.fednnv
+        status: 200
+        note: NEW — DataCite repository client FDAT under member AWZY, ROR-linked to 03a1kwz48.
+      - url: https://ixtheo.de/api/v1/search?lookfor=test
+        status: 200
+        note: >-
+          Live but bot-challenged — a 2,148-byte SHA-256 proof-of-work interstitial branded with
+          University of Tübingen and University Library logos, served for every path. Not defeated.
+      - url: https://katalog.ub.uni-tuebingen.de/
+        status: 403
+        note: 301s to rds-tue.ibs-bw.de/opac/ — IBS|BW consortium platform, recorded as tenant.
+      - url: https://data.uni-tuebingen.de/
+        status: 0
+        note: Does not resolve. No open data portal exists; opendata. and api. also do not resolve.
   - date: '2026-06-03'
     rating: 2
     summary: >-

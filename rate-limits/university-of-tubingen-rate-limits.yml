@@ -4,32 +4,64 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: University of Tübingen
 providerId: university-of-tubingen
 created: '2026-06-03'
-modified: '2026-06-03'
-reconciled: false
+modified: '2026-09-01'
+generated: '2026-09-01'
+method: probed
+reconciled: true
 tags:
 - Education
 - Higher Education
 - University
 - Rate Limiting
 description: >-
-  University of Tübingen does not publish a unified public rate-limit table across its APIs. Open
-  metadata and harvesting endpoints (OAI-PMH, IIIF, library) may throttle large-scale
-  or automated harvesting; clients should harvest politely, honor Retry-After, and
-  contact the relevant service for bulk access.
-notes: Confirm per-service limits with each API's documentation; harvest responsibly.
+  University of Tübingen publishes no rate-limit documentation page, but its FDAT research data
+  repository advertises a concrete, machine-readable limit in response headers. A GET of
+  https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34 on 2026-09-01 returned
+  X-RateLimit-Limit: 500, X-RateLimit-Remaining: 499, X-RateLimit-Reset: 1788292918 and
+  Retry-After: 60 — a 500-request window with a 60-second reset, enforced per client by the
+  InvenioRDM deployment. The OAI-PMH providers publish no headers; FDAT's robots.txt sets
+  Crawl-delay: 10 and disallows /api and /search, which is the operator's stated harvesting
+  posture even though the endpoints themselves are open.
+notes: >-
+  Header values were observed live, not inferred. No numeric limit is published for
+  publikationen.uni-tuebingen.de (TOBIAS-lib OAI-PMH) or for the UB Tübingen discovery services,
+  which instead sit behind a proof-of-work browser challenge that functions as the throttle.
 sources:
+- https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34
+- https://fdat.uni-tuebingen.de/robots.txt
 - https://raw.githubusercontent.com/api-evangelist/university-of-tubingen/refs/heads/main/apis.yml
 responseCodes:
   throttled: 429
+headers:
+- name: X-RateLimit-Limit
+  observed: '500'
+- name: X-RateLimit-Remaining
+  observed: '499'
+- name: X-RateLimit-Reset
+  observed: '1788292918'
+- name: Retry-After
+  observed: '60'
 limits:
-- name: Default
+- name: FDAT repository REST API
   scope: client
   metric: requests-per-minute
-  limit: see service documentation
-  notes: No published global limit; large harvests may be rate-limited.
+  limit: 500
+  notes: >-
+    Observed on live response headers 2026-09-01 (X-RateLimit-Limit 500, Retry-After 60). Applies
+    to https://fdat.uni-tuebingen.de/api/*.
+- name: OAI-PMH harvesting
+  scope: client
+  metric: requests-per-minute
+  limit: 6
+  notes: >-
+    No numeric limit is advertised in headers. FDAT's robots.txt declares Crawl-delay: 10, i.e. six
+    requests per minute is the operator's stated polite-harvest rate; treat it as guidance, not an
+    enforced ceiling.
 policies:
 - name: Backoff Strategy
-  description: Exponential backoff with jitter; honor Retry-After; harvest during off-peak hours.
+  description: Exponential backoff with jitter; honor Retry-After (60s on FDAT); harvest during off-peak hours.
+- name: Crawl Delay
+  description: FDAT robots.txt sets Crawl-delay 10 and disallows /api and /search for crawlers.
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

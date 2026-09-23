@@ -1,0 +1,138 @@
+generated: '2026-09-01'
+method: probed
+source: >-
+  Live probes of University of Tübingen institution-operated hosts on 2026-09-01, plus the DFN-AAI
+  (German national research-and-education identity federation) SAML MDQ service, the DataCite REST
+  API and the ROR REST API.
+docs: https://uni-tuebingen.de/en/249679
+note: >-
+  Conformance against the Kin Score `education` regime standards[]. Every entry below was reached by
+  fetching the named URL and reading the response body — none is a prose claim from a university web
+  page. Standards the institution does not publicly expose are recorded as conforms:false with the
+  negative probe that established it, and are never inferred from the presence of a vendor product.
+  Both OAI-PMH providers, the Shibboleth IdP and the DataCite registrant record are
+  institution-operated. FDAT itself runs InvenioRDM and publikationen.uni-tuebingen.de runs DSpace —
+  those product contracts belong to their upstream projects and are deliberately NOT saved under this
+  institution, but the deployments, the hosts, the admin contacts and the data are Tübingen's, so
+  they are legitimate conformance evidence for the institution.
+  IMPORTANT NEGATIVE-PROBE NOTE: https://mdq.aai.dfn.de/entities/<entityID> answers HTTP 200 with a
+  signed but EMPTY <md:EntitiesDescriptor> when the entityID is not registered. A 200 from that
+  service is therefore not evidence on its own — the entityID below was confirmed by counting
+  EntityDescriptor elements in the body, and the first candidate tried
+  (https://idp.uni-tuebingen.de/idp/shibboleth) returned exactly such an empty 200 and is wrong.
+standards:
+- id: oai-pmh
+  conforms: true
+  operator: institution
+  evidence: >-
+    Two live, independent OAI-PMH 2.0 providers on the institution's own hosts.
+    (1) FDAT research data repository —
+    https://fdat.uni-tuebingen.de/oai2d?verb=Identify returns 200 text/xml, repositoryName "FDAT Data
+    Repository", baseURL https://fdat.uni-tuebingen.de/oai2d, adminEmail
+    fdat@dh-center.uni-tuebingen.de, protocolVersion 2.0, earliestDatestamp 2023-04-11T15:34:13Z,
+    granularity YYYY-MM-DDThh:mm:ssZ, deletedRecord "no". verb=ListMetadataFormats returns marcxml
+    and oai_dc; verb=ListSets enumerates faculty community sets (e.g. community-faculty_eco_social,
+    "Faculty of Economics and Social Sciences").
+    (2) Publikationssystem UB Tübingen (TOBIAS-lib, DSpace) —
+    https://publikationen.uni-tuebingen.de/oai/request?verb=Identify returns 200 text/xml,
+    repositoryName "Publikationssystem UB Tuebingen", adminEmail edl-admin@ub.uni-tuebingen.de,
+    earliestDatestamp 1998-12-16T23:00:00Z, deletedRecord "transient", repositoryIdentifier
+    publikationen.uni-tuebingen.de, sampleIdentifier oai:publikationen.uni-tuebingen.de:10900/64291.
+    verb=ListMetadataFormats returns didl, mods, ore and xMetaDissPlus (the German national
+    dissertation profile) among others. A second base URL /oai/driver?verb=Identify also answers 200.
+- id: shibboleth
+  conforms: true
+  operator: institution
+  evidence: >-
+    Institution-operated Shibboleth Identity Provider, registered in DFN-AAI and published as
+    machine-readable metadata through the federation's MDQ service.
+    https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fshibboleth returns 200
+    application/samlmetadata+xml, 21,696 bytes, containing a real EntityDescriptor (the wrong-guess
+    entityID .../idp/shibboleth returns a signed but empty 7,750-byte wrapper — see note above).
+    mdui:DisplayName "Universität Tübingen" / "University of Tübingen", mdui:Description "Shibboleth
+    IdP Universität Tübingen", shibmd:Scope regexp="false" uni-tuebingen.de, X509SubjectName
+    CN=idp.uni-tuebingen.de,OU=ZDV,O=Universitaet Tuebingen,DC=DE — i.e. the key is held by the
+    university's own computing centre (ZDV). mdrpi:RegistrationInfo registrationAuthority
+    https://www.aai.dfn.de, registrationInstant 2009-05-26T08:35:29Z. The live IdP at
+    https://idp.uni-tuebingen.de/ answers on TLS and serves branded Shibboleth IdP error pages.
+- id: saml
+  conforms: true
+  operator: institution
+  evidence: >-
+    SAML 2.0 throughout the same DFN-AAI metadata. IDPSSODescriptor
+    protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" with SingleSignOnService
+    bindings HTTP-POST (https://idp.uni-tuebingen.de/idp/profile/SAML2/POST/SSO), HTTP-Redirect
+    (.../SAML2/Redirect/SSO) and SOAP/ECP (.../SAML2/SOAP/ECP), NameIDFormat persistent and
+    transient, plus an AttributeAuthorityDescriptor with a SOAP AttributeService. Entity attributes
+    assert REFEDS Research & Scholarship support
+    (http://refeds.org/category/research-and-scholarship), SIRTFI and SIRTFI2 assurance
+    certification (https://refeds.org/sirtfi, https://refeds.org/sirtfi2), the DFN-AAI-IdP
+    collection, eduGAIN export via http://aai.dfn.de/edugain/registrationAuthority, and membership
+    of the Baden-Württemberg federated identity programme bwIDM
+    (http://aai.dfn.de/category/bwidm-member) — the latter independently corroborated by
+    https://www.bwidm.de being linked from the FDAT repository footer.
+- id: orcid
+  conforms: true
+  operator: institution
+  evidence: >-
+    FDAT binds ORCID iDs as typed identifiers rather than free text. GET
+    https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34 (200, application/json, 13,709 bytes)
+    returns metadata.creators[].person_or_org.identifiers entries of the form
+    {"identifier": "0000-0001-6892-5462", "scheme": "orcid"}, alongside CRediT-style role objects
+    (researcher, supervisor) and affiliation strings naming University of Tübingen departments.
+- id: datacite
+  conforms: true
+  operator: institution
+  evidence: >-
+    DataCite member and DOI registrant. https://api.datacite.org/providers/awzy (200) returns member
+    AWZY, name "IKM Universität Tübingen", memberType consortium_organization, country DE, created
+    2020-11-09, rorId https://ror.org/03a1kwz48 (the University of Tübingen ROR record).
+    https://api.datacite.org/clients/awzy.fednnv (200) returns repository client AWZY.FEDNNV, name
+    "FDAT", url https://fdat.uni-tuebingen.de, clientType repository, year 2022, re3data
+    https://doi.org/10.17616/R3PM1K (resolves 200 to re3data r3d100012296). DOI prefix 10.57754 is
+    confirmed as the university's: https://api.datacite.org/prefixes/10.57754 (200) relates the
+    prefix to client awzy.fednnv and provider awzy, and live FDAT records carry DOIs of the form
+    10.57754/FDAT.zvknn-g0x34. Six further DataCite repository clients sit under the same AWZY
+    member (BioData, Concilium, Dokumente-Kirchen-Judentum, Forum Katholische Theologie, Lutherische
+    Theologie und Kirche, Africa Theological Journal), reflecting UB Tübingen's role as a DOI agent
+    for theology publications.
+- id: crossref
+  conforms: false
+  operator: none
+  evidence: >-
+    No Crossref membership found. https://api.crossref.org/members?query=T%C3%BCbingen (200) returns
+    total-results 0. The institution registers DOIs through DataCite, not Crossref.
+- id: scim
+  conforms: false
+  operator: none
+  evidence: >-
+    No SCIM 2.0 endpoint is published. Identity provisioning is described only in prose on the ZDV
+    identity-management pages; no /scim/v2 host or descriptor was reachable, and no SCIM
+    ServiceProviderConfig is exposed on any institution host probed.
+- id: lti
+  conforms: false
+  operator: none
+  evidence: >-
+    No LTI tool or platform registration is published. The VLE estate (ILIAS, Moodle — the ZDV
+    services index lists a "moodlepro" server) sits behind institutional SSO with no public
+    /.well-known/lti-platform-configuration or tool-configuration document.
+- id: oneroster
+  conforms: false
+  operator: none
+  evidence: No OneRoster endpoint or CSV bundle is published on any institution host.
+- id: ed-fi
+  conforms: false
+  operator: none
+  evidence: >-
+    Not applicable and not present — Ed-Fi is a US K-12 data standard with no German
+    higher-education deployment; no Ed-Fi ODS/API descriptor exists on any institution host.
+- id: caliper
+  conforms: false
+  operator: none
+  evidence: No IMS Caliper Analytics event store or endpoint is published.
+- id: qti
+  conforms: false
+  operator: none
+  evidence: >-
+    No QTI assessment interchange endpoint is published. Assessment content lives inside the
+    SSO-gated VLE.

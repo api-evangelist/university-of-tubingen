@@ -1,0 +1,66 @@
+generated: '2026-09-01'
+method: probed
+source: >-
+  Live probes of University of Tübingen institution-operated hosts on 2026-09-01, plus the
+  DFN-AAI SAML MDQ service. Not derived from any OpenAPI — the institution publishes none.
+note: >-
+  Two authentication postures, and they are opposites. Every machine-readable surface the university
+  actually operates for the public — the FDAT REST API, both OAI-PMH providers — is ANONYMOUS: no key,
+  no registration, no self-service credential issuance anywhere on the institution's public estate.
+  Everything else — campus management (alma), the VLE, storage, the licensed library estate — is
+  behind institutional SSO, which is SAML 2.0 via the university's own Shibboleth IdP registered in
+  DFN-AAI. There is no OAuth 2.0 authorization server, no OpenID Connect discovery document and no
+  API-key console on any institution host probed, so no scopes/ artifact is emitted.
+summary:
+  types:
+  - none
+  - saml2
+schemes:
+- name: anonymous-read
+  type: none
+  description: >-
+    Public read access with no credential of any kind. GET
+    https://fdat.uni-tuebingen.de/api/records?size=1 returns 200 application/json (437 records);
+    GET https://fdat.uni-tuebingen.de/api/records/zvknn-g0x34 returns 200 with ETag "6" and a
+    Link rel="linkset" header; GET https://fdat.uni-tuebingen.de/api/communities?size=1 and
+    /api/vocabularies/languages?size=1 both return 200. Both OAI-PMH providers answer
+    verb=Identify with 200 text/xml unauthenticated. Server-side throttling is advertised rather
+    than authentication — X-RateLimit-Limit: 500, X-RateLimit-Remaining, X-RateLimit-Reset and
+    Retry-After: 60 are returned on FDAT API responses. Note that
+    https://fdat.uni-tuebingen.de/robots.txt disallows /api and /search for crawlers with
+    Crawl-delay: 10; the API is open to clients but the operator does not invite bulk crawling.
+  sources:
+  - https://fdat.uni-tuebingen.de/api/records
+  - https://fdat.uni-tuebingen.de/oai2d?verb=Identify
+  - https://publikationen.uni-tuebingen.de/oai/request?verb=Identify
+- name: shibboleth-saml2-sso
+  type: saml2
+  description: >-
+    Institutional single sign-on through the university's own Shibboleth Identity Provider,
+    entityID https://idp.uni-tuebingen.de/shibboleth, scope uni-tuebingen.de, registered in DFN-AAI
+    since 2009-05-26 and exported to eduGAIN. SSO endpoints: HTTP-POST
+    https://idp.uni-tuebingen.de/idp/profile/SAML2/POST/SSO, HTTP-Redirect
+    https://idp.uni-tuebingen.de/idp/profile/SAML2/Redirect/SSO, SOAP/ECP
+    https://idp.uni-tuebingen.de/idp/profile/SAML2/SOAP/ECP. NameID formats: persistent and
+    transient. A SAML 2.0 AttributeAuthorityDescriptor with a SOAP AttributeService is also
+    published. The entity asserts REFEDS Research & Scholarship support and SIRTFI + SIRTFI2
+    assurance certification, and is a bwIDM member (the Baden-Württemberg federated identity
+    programme). Relying parties obtain the signing key and endpoints from federation metadata, not
+    from the university — this is a federated trust surface, not a self-service API credential.
+  sources:
+  - https://mdq.aai.dfn.de/entities/https%3A%2F%2Fidp.uni-tuebingen.de%2Fshibboleth
+  - https://uni-tuebingen.de/en/einrichtungen/zentrum-fuer-datenverarbeitung/dienstleistungen/digitale-identitaet/single-sign-on/
+negative_probes:
+- url: https://uni-tuebingen.de/.well-known/security.txt
+  status: 404
+- url: https://uni-tuebingen.de/llms.txt
+  status: 404
+- url: https://uni-tuebingen.de/apis.json
+  status: 404
+- url: https://fdat.uni-tuebingen.de/openapi.json
+  status: 404
+- url: https://fdat.uni-tuebingen.de/.well-known/security.txt
+  status: 404
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
