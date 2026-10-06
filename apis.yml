@@ -71,7 +71,7 @@ tags:
   - Library
   - DataCite
 created: '2026-06-03'
-modified: '2026-09-01'
+modified: '2026-10-06'
 specificationVersion: '0.23'
 apis:
   - aid: university-of-tubingen:fdat-rest
@@ -282,6 +282,10 @@ apis:
     baseURL: https://rds-tue.ibs-bw.de/opac/
     tags: [ Library, Discovery, Catalog, Tenant, IBS|BW ]
 common:
+  - url: https://uni-tuebingen.de/en/fakultaeten/evangelisch-theologische-fakultaet/fakultaet/aktuelles/
+    type: Blog
+  - url: https://uni-tuebingen.de/en/fakultaeten/evangelisch-theologische-fakultaet/fakultaet/aktuelles/feed.xml
+    type: BlogRSS
   - type: Website
     url: https://uni-tuebingen.de/en/
   - type: APIReference
